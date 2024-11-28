@@ -8,7 +8,10 @@ import matplotlib.pyplot as plot # Create Viz
 import seaborn as sns # Create Viz
 import plotly.express as px # Create Viz
 from collections import Counter # count Values each value
-import pickle # load Model Ai
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+#import pickle # load Model Ai
 import base64 # Read Pdf
 #--------------------------------------------------------------------Functions----------------------------------------------------------------------------------------------------------------------------------
 # Data trend 
@@ -342,16 +345,18 @@ elif option == 'EDA':
     st.title("Thank You")
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 elif option == 'ML':
-    # laode  model
     st.title("Model AI")
     st.write("*"*50)
     st.title("Predict loan status")
     st.subheader("Predict Approved OR Rejected The Lone")
-    st.subheader('Algorithms : Random Forest --- Accuracy: 95.8%')
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    #Preprocessing Data LabelEncoder AND OUTLIYR
+    #LabelEncoder for person_home_ownership
     st.write("Fill Form for Predict loan status And Click Botten Sunmit for show result")
     st.write("*"*50)
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #create form And replace date object
+    
     col31 , col32 , col33 ,col34 = st.columns(4)
     with col31 :
         age = st.number_input("age person")
@@ -385,15 +390,49 @@ elif option == 'ML':
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #loade model AI
     st.title("Result loan_status ")
+    ownership_list=list(pd.unique(df['person_home_ownership']))
+    list_index=[0,1,2,3]
+    person_home_ownership_code=pd.DataFrame({'value':ownership_list ,'code':list_index})
+    df['person_home_ownership']=df['person_home_ownership'].replace({'RENT':0,'OWN':1,'MORTGAGE':2,'OTHER':3})
+    #LabelEncoder for cb_person_default_on_file
+    cb_person_default_on_file_list=list(pd.unique(df['cb_person_default_on_file']))
+    list_index3=[0,1]
+    person_home_ownership_code=pd.DataFrame({'value':cb_person_default_on_file_list ,'code':list_index3})
+    df['cb_person_default_on_file']=df['cb_person_default_on_file'].replace({'N':0,'Y':1})
+    #LabelEncoder for loan_intent
+    loan_intent_list=list(pd.unique(df["loan_intent"]))
+    list_index1=[0,1,2,3,4,5]
+    loan_intent_code=pd.DataFrame({'value':loan_intent_list ,'code':list_index1})
+    df["loan_intent"]=df["loan_intent"].replace({"EDUCATION":0,'MEDICAL':1,'PERSONAL':2,'VENTURE':3,'DEBTCONSOLIDATION':4,'HOMEIMPROVEMENT':5}) 
+    #LabelEncoder for loan_grade
+    loan_grade_list=list(pd.unique(df['loan_grade']))
+    list_index2=[0,1,2,3,4,5,6]
+    loan_grade_code=pd.DataFrame({'value':loan_grade_list ,'code':list_index2})
+    df["loan_grade"]=df["loan_grade"].replace({ 'B':0,'C':1,'A':2,'D':3,'E':4,'F':5,'G':6})  
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    # bast model
+    #Data prtation
+    X=df.drop(["id","loan_status"] ,axis=1)
+    y=df["loan_status"]
+    #RandomForestClassifier
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,random_state=49)
     btn = st.button("Submit")
-    model = pickle.load(open(r'D:\project_finel\my_model.pkl','rb'))
-    X_new=[age, income,iosh,pperson_emp_length,ili,ilg,loan_amnt,loan_int_rate,loan_percent_income,icpdof,cb_person_cred_hist_length]
-    X_new_array = np.array(X_new)
-    X_new_reshaped = X_new_array.reshape(1, -1)
-    result = model.predict(X_new_reshaped)
+    #model = pickle.load(open(r'D:\project_finel\my_model.pkl','rb'))
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #predict bottun
     if btn:
+        #model
+        model = RandomForestClassifier()
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        #Result
+        mm=str(np.round(accuracy*100,1))+"%"
+        st.subheader(f'Algorithms : Random Forest --- Accuracy: {mm}')
+        X_new=[age, income,iosh,pperson_emp_length,ili,ilg,loan_amnt,loan_int_rate,loan_percent_income,icpdof,cb_person_cred_hist_length]
+        X_new_array = np.array(X_new)
+        X_new_reshaped = X_new_array.reshape(1, -1)
+        result = model.predict(X_new_reshaped)
         if result == 1:
             st.write("-----------------------------")
             st.title("The bank will Approved the loan")
