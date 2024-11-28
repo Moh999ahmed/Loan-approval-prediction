@@ -91,7 +91,7 @@ def create_boxplots(df):
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # configure page And read Data
 st.set_page_config(layout='wide')
-df = pd.read_csv(r'D:\project_finel\Loan approval prediction.csv')
+df = pd.read_csv('Loan approval prediction.csv')
 df_copy =df.copy()
 df_copy2=df_copy.drop(["loan_status","id"] , axis=1)
 DataTrend=[]
@@ -446,14 +446,14 @@ elif option == 'ML':
     st.write("*"*50)
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 elif option =="Home":
-    image1 = Image.open(r'D:\project_finel\machinfy_logo.jpeg')
+    image1 = Image.open('machinfy_logo.jpeg')
     st.image(image1,width=50)
     st.title("Graduation project")
     st.title("Application Loan Approval Prediction")
     st.write("*"*50)
     st.subheader("Student Design : Mohamed Hasab Elnaby Badry" )
     st.subheader("Photo : ")
-    image = Image.open(r'D:\project_finel\I_am.jpg')
+    image = Image.open('I_am.jpg')
     st.image(image,width=200 )
     st.subheader("Mail : mohammedhasebelnabi@gmail.com")
     st.subheader('Tel : 01115460524 - 01555156024')
@@ -817,11 +817,11 @@ elif option == "NoteBook":
     option_note=st.sidebar.radio("Select NoteBook",list_note)
     st.title("This NōtBo͝ok : "+ option_note)
     if option_note == "EDA":
-        with open(r'D:\project_finel\Loan approval prediction.html',"r") as f:
+        with open('Loan approval prediction.html',"r") as f:
             html_content = f.read()
         components.v1.html(html_content, width=1600, height=850, scrolling=True)
     elif option_note=="Model":
-        with open(r'D:\project_finel\Model Al for Loan approval.html',"r") as f:
+        with open('Model Al for Loan approval.html',"r") as f:
             html_content = f.read()
         components.v1.html(html_content, width=1600, height=850, scrolling=True)
     st.title("Thank You")
